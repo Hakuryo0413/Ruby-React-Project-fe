@@ -4,6 +4,7 @@ const apiConfig = {
   userLogin: `${configKeys.API_URL}login`,
   userRegister: `${configKeys.API_URL}signup`,
   userLogout: `${configKeys.API_URL}logout`,
+  userDetail: `${configKeys.API_URL}/api/v1/users`,
 
   allChallenges: `${configKeys.API_URL}/api/v1/challenges`,
   specificChallenge: `${configKeys.API_URL}/api/v1/challenges`,

@@ -1,25 +1,19 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import { dateFormater } from "@src/utils/common";
 import CustomProvider from "../shared/CustomProvider";
 import {
-  Avatar,
   Button,
   Card,
   Col,
   Divider,
   List,
-  Progress,
+  Modal,
   Row,
   Space,
-  Tag,
   Typography,
 } from "antd";
 import { QuestionInterface } from "@src/types/QuestionInterface";
-import {
-  getAllQuestions,
-  getAllQuestionsOfChallenge,
-} from "@src/features/questions/AllQuestions";
+import { getAllQuestionsOfChallenge } from "@src/features/questions/AllQuestions";
 import CustomTag from "../shared/CustomTag";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -41,7 +35,21 @@ const QuestionsTab: React.FC = () => {
   const [dataChallenge, setDataChallenge] = useState<ChallengeInterface>();
   const navigate = useNavigate();
   const { id } = useParams();
-  const { Title, Text } = Typography;
+  const { Title } = Typography;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+    fetchQuestion(Number(id));
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
   const fetchQuestion = async (challenge_id: Number) => {
     try {
       const data = await getAllQuestionsOfChallenge(challenge_id);
@@ -63,7 +71,7 @@ const QuestionsTab: React.FC = () => {
   const handleDelete = async (challenge_id: Number, quesiton_id: Number) => {
     try {
       const data = await deleteQuestionFunc(challenge_id, quesiton_id);
-      alert("Deleted");
+      showModal();
     } catch (error) {
       console.error("Error fetching all news", error);
     }
@@ -73,14 +81,6 @@ const QuestionsTab: React.FC = () => {
     fetchQuestion(Number(id));
   }, []);
 
-  useEffect(() => {
-    fetchQuestion(Number(id));
-  }, [handleDelete]);
-  const total = 708;
-  const solved = 17;
-  const attempting = 0;
-
-  const progressPercent = (solved / total) * 100;
   return (
     <CustomProvider>
       <Row gutter={16}>
@@ -105,75 +105,26 @@ const QuestionsTab: React.FC = () => {
                   <Title level={3} style={{ margin: 0 }}>
                     {dataChallenge?.title}
                   </Title>
-                  {/* <Text type="secondary">
-                    LeetCode · 708 questions · 2462 Saved
-                  </Text>
-                  <div style={{ marginTop: 12 }}>
-                    <Space>
-                      <Button
-                        type="primary"
-                        icon={<PlayCircleOutlined />}
-                        shape="round"
-                      >
-                        Practice
-                      </Button>
-                      <Button shape="circle" icon={<StarOutlined />} />
-                      <Button shape="circle" icon={<ExportOutlined />} />
-                      <Button shape="circle" icon={<ShareAltOutlined />} />
-                    </Space>
-                  </div> */}
-                  <Text
-                    type="secondary"
-                    style={{ display: "block", marginTop: 8 }}
-                  >
-                    ⚡ Updated: an hour ago
-                  </Text>
+                  <p className="text-blue-400 font-medium">
+                    LeetCode · {dataQuestion.length} questions
+                  </p>
                 </div>
               </div>
             }
           >
-            <Divider orientation="left">Progress</Divider>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              {/* Circular progress
-              <div style={{ textAlign: "center", flex: 1 }}>
-                <Progress
-                  type="dashboard"
-                  percent={progressPercent}
-                  format={() => (
-                    <>
-                      <Title level={3} style={{ margin: 0 }}>
-                        {solved}
-                      </Title>
-                      <Text type="secondary">/{total} Solved</Text>
-                      <div style={{ color: "gray", marginTop: 4 }}>
-                        {attempting} Attempting
-                      </div>
-                    </>
-                  )}
-                  strokeColor="#52c41a"
-                />
-              </div> */}
-
-              {/* Tags by level */}
-              <div style={{ flex: 1 }}>
-                <div style={{ marginBottom: 12 }}>
-                  <Tag color="cyan">Easy</Tag> <Text>15 / 171</Text>
-                </div>
-                <div style={{ marginBottom: 12 }}>
-                  <Tag color="gold">Med.</Tag> <Text>2 / 420</Text>
-                </div>
-                <div>
-                  <Tag color="red">Hard</Tag> <Text>0 / 117</Text>
-                </div>
-              </div>
+            <div style={{ marginTop: 12 }}>
+              <Space>
+                <Button
+                  type="primary"
+                  icon={<PlayCircleOutlined />}
+                  shape="round"
+                >
+                  Practice
+                </Button>
+                <Button shape="circle" icon={<StarOutlined />} />
+                <Button shape="circle" icon={<ExportOutlined />} />
+              </Space>
             </div>
-
             <Divider />
             <Button type="link" icon={<MessageOutlined />}>
               Discuss
@@ -200,7 +151,7 @@ const QuestionsTab: React.FC = () => {
                   }
                 />
                 <div className="text-black">
-                  {/* <CustomTag category={item?.level} /> */}
+                  <CustomTag category={item?.level} />
                 </div>
                 <StarOutlined />
                 <DeleteOutlined
@@ -211,6 +162,13 @@ const QuestionsTab: React.FC = () => {
           />
         </Col>
       </Row>
+      <Modal
+        title="Delete success"
+        closable={{ "aria-label": "Custom Close Button" }}
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      ></Modal>
     </CustomProvider>
   );
 };

@@ -102,9 +102,9 @@ const QuestionForm: React.FC = () => {
                     placeholder="Select level"
                     onChange={handleChange}
                     options={[
-                      { value: "easy", label: "Easy" },
-                      { value: "medium", label: "Medium" },
-                      { value: "hard", label: "Hard" },
+                      { value: "Easy", label: "Easy" },
+                      { value: "Medium", label: "Medium" },
+                      { value: "Hard", label: "Hard" },
                     ]}
                   />
                 </Form.Item>

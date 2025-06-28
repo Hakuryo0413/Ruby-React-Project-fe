@@ -1,27 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { Button, Input, Form, ConfigProvider } from "antd";
+import { Button, ConfigProvider, Card, Avatar } from "antd";
 
 import { LeftOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
-import { UserDetail } from "@src/types/UserInterface";
+import { UserInterface } from "@src/types/UserInterface";
+import { getDetailUser } from "@src/features/auth/DetailMe";
+const { Meta } = Card;
 
 const Profile: React.FC = () => {
   let navigate = useNavigate();
-  const [detailMe, setDetailMe] = useState<UserDetail>(null);
+  let user_id = 15;
+  const [userDetail, setUserDetail] = useState<UserInterface>();
+  const getUser = async (user_id: Number) => {
+    try {
+      const data = await getDetailUser(user_id);
+      setUserDetail(data.data);
+    } catch (error) {
+      console.error("Error fetching all news", error);
+    }
+  };
 
-  // useEffect(() => {
-  //   const detailMe = async () => {
-  //     try {
-  //       const data = await getDetailMeInfo();
-  //       setDetailMe(data);
-  //       console.log("Fetched data:", data);
-  //     } catch (error) {
-  //       console.error("Error fetching news info", error);
-  //     }
-  //   };
-  //   detailMe();
-  // }, []);
-
+  useEffect(() => {
+    getUser(user_id);
+  }, []);
   return (
     <ConfigProvider
       theme={{
@@ -36,50 +37,37 @@ const Profile: React.FC = () => {
       }}
     >
       <div className="space-y-6 px-40">
-        <div className="bg-[#B75A4A] m-4 p-4 rounded-2xl">
-          <Button
-            type="text"
-            className="!text-white"
-            onClick={() => navigate("/home")}
-          >
+        <div className=" m-4 p-4 rounded-2xl ">
+          <Button type="text" onClick={() => navigate("/home")}>
             <LeftOutlined />
             Back
           </Button>
 
-          <p className="text-3xl text-center text-white font-medium ">
-            MY PROFILE
-          </p>
-          <Form layout="vertical">
-            <Form.Item label="Full Name" className="mb-4">
-              <Input
-                placeholder="Enter your fullname"
-                value={detailMe?.full_name}
-                // onChange={handleTitleChange}
-                allowClear
-              />
-            </Form.Item>
-            <Form.Item label="Email" className="mb-4">
-              <Input
-                placeholder="Enter your email"
-                value={detailMe?.email}
-                // onChange={handleTitleChange}
-                allowClear
-              />
-            </Form.Item>
-            <Form.Item label="API KEY D-ID" className="mb-4">
-              <Input
-                placeholder="Enter your API KEY"
-                // value={newsTitle}
-                // onChange={handleTitleChange}
-                allowClear
-              />
-            </Form.Item>
-          </Form>
-          <div className="flex justify-center">
-            <Button type="primary" size="large">
-              Update Profile
-            </Button>
-          </div>
+          <Card style={{ width: "100%" }}>
+            <Meta
+              avatar={
+                <Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=8" />
+              }
+              title={userDetail?.email}
+            />
+
+            <div className="space-y-3 mt-4">
+              <div className="flex justify-between">
+                <p className="text-gray-500 font-medium">Full Name:</p>
+                <p className="text-gray-800">{userDetail?.email}</p>
+              </div>
+              <div className="flex justify-between">
+                <p className="text-gray-500 font-medium">Rank:</p>
+                <p className="text-gray-800">100</p>
+              </div>
+              <div className="flex justify-between">
+                <p className="text-gray-500 font-medium">Total Points:</p>
+                <p className="text-gray-800">
+                  {userDetail?.total_points.toString()}
+                </p>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
     </ConfigProvider>
