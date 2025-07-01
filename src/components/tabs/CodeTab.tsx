@@ -1,4 +1,4 @@
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
 import { Button, Col, Modal, Result, Row, Select, Tabs } from "antd";
 import CustomProvider from "../shared/CustomProvider";
@@ -11,7 +11,6 @@ import CustomTag from "../shared/CustomTag";
 import { useNavigate, useParams } from "react-router-dom";
 import { CreateSubmissionInterface } from "../../types/SubmissionInterface";
 import { useCookies } from "react-cookie";
-import configKeys from "@src/utils/config";
 
 const headers = {
   "content-type": "application/json",
@@ -26,7 +25,7 @@ const CodeTab: React.FC = () => {
   const [activeKey, setActiveKey] = useState("1");
   const [items, setItems] = useState<any[]>([]);
   const [ok, setOk] = useState("");
-  const [hihi, setHihi] = useState<Boolean>(false);
+  const [passed, setPassed] = useState<Boolean>();
   const [output, setOutput] = useState<string>("");
   const [code, setCode] = useState<string>(``);
   const [dataQuestion, setDataQuestion] = useState<QuestionInterface>();
@@ -34,23 +33,6 @@ const CodeTab: React.FC = () => {
 
   const handleChange = (value: string) => {
     console.log(`selected ${value}`);
-  };
-
-  const submit = async (question_id: Number) => {
-    const payload: CreateSubmissionInterface = {
-      code: code,
-      status: ok,
-    };
-    try {
-      const data = await createSubmissionFunc(payload, question_id, jwt);
-      if (data.data.status == "Accepted") {
-        setHihi(true);
-      } else setHihi(false);
-      console.log(hihi);
-      showModal();
-    } catch (error) {
-      console.error("Error fetching all news", error);
-    }
   };
 
   const showModal = () => {
@@ -70,54 +52,32 @@ const CodeTab: React.FC = () => {
     navigate("/home");
   };
 
-  const runAllTestCases = async () => {
-    if (!dataQuestion?.test_cases) return;
+  const handleSubmit = async (
+    payload: CreateSubmissionInterface,
+    question_id: Number
+  ) => {
+    try {
+      const res = await createSubmissionFunc(payload, question_id, jwt);
+      const { results, status } = res.data;
 
-    const results = [];
-
-    for (const tc of dataQuestion.test_cases) {
-      const body = {
-        language_id: 71,
-        source_code: code,
-        stdin: tc.input,
-      };
-      try {
-        const res = await fetch(configKeys.JUDGE0_API, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(body),
-        });
-        console.log(JSON.stringify(body));
-        const data = await res.json();
-        const actualOutput = (data.stdout || "").trim();
-        const expectedOutput = tc.expect_output.trim();
-        const passed = actualOutput === expectedOutput;
-
-        results.push({
-          input: tc.input,
-          expect_output: expectedOutput,
-          actual_output: actualOutput,
-          passed,
-        });
-      } catch (err) {
-        results.push({
-          input: tc.input,
-          expect_output: tc.expect_output,
-          actual_output: "Error",
-          passed: false,
-        });
-      }
+      setOk(status);
+      setOutput(JSON.stringify(results, null, 2));
+      setPassed(status === "Accepted");
+      showModal();
+    } catch (error) {
+      console.error("Submit failed", error);
+      setOk("Failed");
+      setOutput("Error occurred");
+      setPassed(false);
+      showModal();
     }
-    const allPassed = results.every((res) => res.passed);
-    console.log("Test Results", results);
-    setOk(allPassed ? "Accepted" : "Failed");
-    setOutput(JSON.stringify(results, null, 2));
   };
 
   const fetchQuestion = async (question_id: Number) => {
     try {
       const data = await getSpecificQuestion(question_id);
       setDataQuestion(data);
+      console.log(data?.id);
       setCode(data?.starter_code);
       const data1 = data?.test_cases;
       const formatted = data1.map((tc, index) => ({
@@ -179,9 +139,21 @@ const CodeTab: React.FC = () => {
               { value: "54", label: "C++ (GCC 9.2.0)" },
             ]}
           />
-          <Button onClick={runAllTestCases}>Run Code</Button>
-          <Button onClick={() => submit(dataQuestion?.id)}>Submit</Button>
-
+          {/* <Button onClick={runAllTestCases}>Run Code</Button> */}
+          <Button
+            onClick={() =>
+              handleSubmit(
+                {
+                  code: code,
+                  status: "Pending",
+                  language_id: 71,
+                },
+                dataQuestion?.id
+              )
+            }
+          >
+            Submit
+          </Button>
           <Editor
             height="300px"
             defaultLanguage="python"
@@ -208,7 +180,7 @@ const CodeTab: React.FC = () => {
                 }`}
               >
                 {ok}
-              </span>{" "}
+              </span>
             </span>
           </div>
         </Col>
@@ -221,7 +193,7 @@ const CodeTab: React.FC = () => {
         onCancel={handleCancel}
         footer={null}
       >
-        {hihi ? (
+        {passed ? (
           <Result
             status="success"
             title="Successfully Purchased Cloud Server ECS!"

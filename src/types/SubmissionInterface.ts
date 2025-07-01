@@ -9,4 +9,5 @@ export interface SubmissionInterface {
 export interface CreateSubmissionInterface {
   code: string;
   status: string;
+  language_id: Number;
 }
