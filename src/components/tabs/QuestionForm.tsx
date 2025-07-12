@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Button,
   Input,
@@ -36,8 +36,10 @@ const QuestionForm: React.FC = () => {
   const createQuestionFunction = async (payload: CreateQuestionInterface) => {
     try {
       await createQuestionFunc(payload, Number(id));
+      navigate(`/challenge/${id}`);
     } catch (error) {
       console.error("Error creating question", error);
+      alert("Failed to create question: An error occurred. Please try again.");
     }
   };
 

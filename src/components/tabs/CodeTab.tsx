@@ -196,7 +196,7 @@ const CodeTab: React.FC = () => {
         {passed ? (
           <Result
             status="success"
-            title="Successfully Purchased Cloud Server ECS!"
+            title="Your Solution Passed!!"
             extra={[
               <Button type="primary" onClick={handleGoBackChallenge}>
                 Go back Challenge

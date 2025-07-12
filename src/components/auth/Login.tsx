@@ -31,7 +31,7 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (cookies.jwt) {
-      navigate("/");
+      navigate("/home");
     }
   }, []);
   const login = async (payload: UserLoginPayload) => {

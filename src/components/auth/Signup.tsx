@@ -17,22 +17,25 @@ import LinkedIn from "@src/assets/linkedln";
 import Facebook from "@src/assets/facebookLogo";
 import { UserRegisterPayload } from "@src/types/UserInterface";
 import { registerFunc } from "@src/features/auth/Register";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Image } from "antd";
 
 const Signup: React.FC = () => {
+  const navigate = useNavigate();
+
   const register = async (payload: UserRegisterPayload) => {
     try {
       await registerFunc(payload);
+      navigate("/login");
     } catch (error) {
       console.error("Error siging up", error);
+      alert("Registration failed: An error occurred. Please try again.");
     }
   };
 
   const onFinish = (values: UserRegisterPayload) => {
     console.log("Received values of form: ", values);
     register(values);
-    window.location.href = "/login";
   };
 
   return (

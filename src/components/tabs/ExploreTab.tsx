@@ -42,7 +42,7 @@ const ExploreTab: React.FC = () => {
               title={
                 <a
                   onClick={() => navigate(`/challenge/${item.id}`)}
-                  className="!text-white hover:underline cursor-pointer"
+                  className="!text-white hover:underline cursor-pointer text-lg font-semibold"
                 >
                   {item.title}
                 </a>
@@ -52,12 +52,17 @@ const ExploreTab: React.FC = () => {
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 color: "white",
-                minHeight: 200,
+                minHeight: 230,
               }}
             >
-              <div>{item.description}</div>
-              <div>Start date {item.start_date}</div>
-              <div>End date {item.end_date}</div>
+              <div className="text-sm sm:text-base font-medium text-white space-y-2">
+                <p className="text-white/90">{item.description}</p>
+
+                <div className="text-xs text-white space-y-1 pt-1 ">
+                  <p>Start date: {item.start_date}</p>
+                  <p>End date: {item.end_date}</p>
+                </div>
+              </div>
             </Card>
           </List.Item>
         )}

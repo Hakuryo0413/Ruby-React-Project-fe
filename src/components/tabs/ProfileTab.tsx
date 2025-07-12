@@ -9,7 +9,7 @@ const { Meta } = Card;
 
 const Profile: React.FC = () => {
   let navigate = useNavigate();
-  let user_id = 15;
+  let user_id = 1;
   const [userDetail, setUserDetail] = useState<UserInterface>();
   const getUser = async (user_id: Number) => {
     try {

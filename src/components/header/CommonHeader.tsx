@@ -35,7 +35,7 @@ function CommonHeader() {
           <div className="lg:mx-2 mx-auto px-4 md:px-6 lg:px-8">
             <div className="relative flex h-16 items-center justify-between">
               <a
-                href="/"
+                href="/home"
                 className="text-black flex text-bold text-4xl font-logo"
               >
                 <Image
